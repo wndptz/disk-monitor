@@ -1,0 +1,127 @@
+/* CSS completo do dashboard */
+body {
+    background-color: #f0f0f0;  /* Cinza claro para o fundo externo */
+    margin: 0;
+    padding: 20px 0;           /* Espaço vertical ao redor do container */
+}
+
+/* Container principal com cor diferente */
+.main-container {
+    max-width: 1050px;
+    margin: 0 auto;
+    background-color: #ffffff;  /* Branco para o fundo do conteúdo */
+    border-radius: 8px;         /* Cantos arredondados */
+    box-shadow: 0 2px 15px rgba(0,0,0,0.1);  /* Sombra suave */
+    padding: 30px;
+    min-height: calc(100vh - 40px);  /* Altura mínima ajustada */
+}
+
+.controls {
+    position: relative;
+    z-index: 200;
+}
+
+.refresh-btn {
+    cursor: pointer;
+    padding: 8px 16px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+}
+
+.layout-btn {
+    margin-bottom: 15px;
+    padding: 8px 16px;
+    background: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.tab {
+    cursor: pointer;
+    padding: 10px;
+    border: 1px solid #ccc;
+    display: inline-block;
+}
+
+.active-tab {
+    background: #ddd;
+}
+
+.tab-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.active-content {
+    display: block;
+}
+
+.loading-overlay {
+    position: fixed; /* Alterado de absolute para fixed */
+    top: 0;
+    left: 0;
+    width: 100vw; /* 100% da largura da viewport */
+    height: 100vh; /* 100% da altura da viewport */
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 100;
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+.loading-content {
+    padding: 20px;
+    background: white;
+    border-radius: 5px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    text-align: center;
+}
+
+.tab-container {
+    position: relative;
+    margin-top: 20px;
+    width: 100%;
+}
+
+/* Container das tabelas na aba de diretórios */
+.directory-content {
+    width: 100%;
+    max-width: 900px;  /* Largura menor que o container principal */
+    margin: 0 auto;     /* Centralização horizontal */
+}
+
+table {
+    width: 100%;
+    margin: 20px 0;
+    background-color: #f8f9fa;  /* Fundo cinza muito claro para tabelas */
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.table-wrapper {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.charts-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center; /* Centraliza os gráficos */
+}
+
+.charts-container.horizontal {
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.charts-container.horizontal > div {
+    flex: 1;
+    min-width: 45%;
+}
