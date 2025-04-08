@@ -11,6 +11,7 @@ Um dashboard web para monitorar o uso de disco em tempo real, desenvolvido em Py
 
 ## 📁 Estrutura do Projeto
 
+```
 disk-monitor/
 ├── static/
 │   ├── styles.css        # Estilos CSS da interface
