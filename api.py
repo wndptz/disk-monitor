@@ -15,7 +15,11 @@ templates = Jinja2Templates(directory="templates")
 
 @app.get("/data")
 async def get_data():
-    return get_disk_usage().to_dict(orient="records")
+    disk_df = get_disk_usage()
+    return {
+        "partitions": disk_df.to_dict(orient="records"),
+        "mountpoints": disk_df['mountpoint'].tolist()
+    }
 
 @app.get("/directory_data")
 async def get_directory_data():

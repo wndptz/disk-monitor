@@ -1,21 +1,23 @@
-let dataLoaded = false;
+let loadingData = false;
 let isHorizontalLayout = false;
 
 async function handleDirectoriesTab() {
     switchTab('directories');
-    if (!dataLoaded) {
+    if (!loadingData) {
         await loadDirectories();
     }
 }
 
 async function forceReloadDirectories() {
-    dataLoaded = false;
+    loadingData = false;
     await loadDirectories();
 }
 
 async function loadDirectories() {
-    if (dataLoaded) return;
+    if (loadingData) return;
     
+    loadingData = true;
+    // Criar o loadingOverlay
     const loadingOverlay = document.createElement('div');
     loadingOverlay.id = 'loading';
     loadingOverlay.className = 'loading-overlay';
@@ -43,45 +45,18 @@ async function loadDirectories() {
     contentContainer.appendChild(refreshBtn);
 
     try {
-        const response = await fetch('/directory_data');
-        const data = await response.json();
+        // Primeiro carrega os mountpoints para criar os esqueletos
+        const mountsResponse = await fetch('/data');
+        const { mountpoints } = await mountsResponse.json();
         
-        for (const mp of Object.keys(data)) {
-            // Criar elementos dinamicamente
-            const wrapper = document.createElement('div');
-            wrapper.className = 'table-wrapper';
-            
-            const title = document.createElement('h3');
-            title.textContent = `${mp} (Total Usado: ${formatBytes(data[mp].total_used)}) (${data[mp].percent}%)`;
-            
-            const table = document.createElement('table');
-            table.border = 1;
-            
-            // Criar cabeçalho
-            const headerRow = table.insertRow();
-            headerRow.insertCell().textContent = 'Diretório';
-            headerRow.insertCell().textContent = 'Tamanho';
-            
-            // Adicionar linhas
-            (data[mp].items || []).forEach(item => {
-                const row = table.insertRow();
-                row.insertCell().textContent = item.path;
-                row.insertCell().textContent = item.size;
-            });
-            
-            // Montar estrutura
-            wrapper.appendChild(title);
-            wrapper.appendChild(table);
-            contentContainer.appendChild(wrapper);
-            
-            // Adicionar linha separadora
-            contentContainer.appendChild(document.createElement('hr'));
-            
-            // Pequeno delay para visualização progressiva (opcional)
-            await new Promise(resolve => setTimeout(resolve, 50));
-        }
+        createSkeletons(mountpoints, contentContainer);
         
-        dataLoaded = true;
+        // Agora carrega os dados completos
+        const dirResponse = await fetch('/directory_data');
+        const dirData = await dirResponse.json();
+        
+        await populateTables(dirData, contentContainer);
+        
     } catch (error) {
         alert('Erro: ' + error);
     } finally {
@@ -91,92 +66,50 @@ async function loadDirectories() {
     }
 }
 
-/* async function loadDirectories() {
-    if (dataLoaded) return;
+function createSkeletons(mountpoints, container) {
+    mountpoints.forEach(mp => {
+        const skeleton = document.createElement('div');
+        skeleton.className = 'table-wrapper skeleton';
+        skeleton.innerHTML = `
+            <h3 class="skeleton-title">${mp}</h3>
+            <table class="skeleton-table">
+                <tr><th>Diretório</th><th>Tamanho</th></tr>
+                ${Array(5).fill().map(() => `
+                    <tr>
+                        <td><div class="skeleton-line"></div></td>
+                        <td><div class="skeleton-line"></div></td>
+                    </tr>
+                `).join('')}
+            </table>
+        `;
+        container.appendChild(skeleton);
+    });
+}
+
+async function populateTables(data, container) {
+    const wrappers = container.querySelectorAll('.table-wrapper');
     
-    // Criar elemento de loading dinamicamente
-    const loadingOverlay = document.createElement('div');
-    loadingOverlay.id = 'loading';
-    loadingOverlay.className = 'loading-overlay';
-    loadingOverlay.innerHTML = `
-        <div class="loading-content">
-            Carregando dados dos diretórios...
-            <p>  Este processo pode demorar  </p>
-            <p> ☕ </p>
-        </div>
+    for (const [index, mp] of Object.keys(data).entries()) {
+        if (wrappers[index]) {
+            const wrapper = wrappers[index];
+            wrapper.classList.remove('skeleton');
+            wrapper.innerHTML = buildTableContent(mp, data[mp]);
+            await new Promise(resolve => setTimeout(resolve, 50));
+        }
+    }
+}
+
+function buildTableContent(mp, data) {
+    return `
+        <h3>${mp} (${formatBytes(data.total_used)}) (${data.percent}%)</h3>
+        <table border="1">
+            <tr><th>Diretório</th><th>Tamanho</th></tr>
+            ${(data.items || []).map(item => `
+                <tr><td>${item.path}</td><td>${item.size}</td></tr>
+            `).join('')}
+        </table>
     `;
-    
-    // Adicionar o loading antes do conteúdo existente
-    const directoriesDiv = document.getElementById('directories');
-    directoriesDiv.prepend(loadingOverlay);
-    loadingOverlay.style.display = 'flex';
-
-    try {
-        const response = await fetch('/directory_data');
-        const data = await response.json();
-        
-        let html = `<button class="refresh-btn" onclick="forceReloadDirectories()">Atualizar</button>`;
-        for (const mp of Object.keys(data)) {
-            const totalUsed = formatBytes(data[mp].total_used);
-            const percent = data[mp].percent;
-            html += `
-                <div class="table-wrapper">
-                    <h3>${mp} (Total Usado: ${totalUsed}) (${percent}%)</h3>
-                    <table border="1">
-                        <tr><th>Diretório</th><th>Tamanho</th></tr>
-                        ${(data[mp].items || []).map(item => `
-                            <tr><td>${item.path}</td><td>${item.size}</td></tr>
-                        `).join('')}
-                    </table>
-                </div>
-                <hr>
-            `;
-        }
-        
-        document.querySelector('.directory-content').innerHTML = html;
-        dataLoaded = true;
-    } catch (error) {
-        alert('Erro: ' + error);
-    } finally {
-        // Remover o loading após conclusão
-        if (directoriesDiv.contains(loadingOverlay)) {
-            directoriesDiv.removeChild(loadingOverlay);
-        }
-    }
-} */
-
-/* async function loadDirectories() {
-    if (dataLoaded) return;
-    
-    document.getElementById('loading').style.display = 'flex';
-    try {
-        const response = await fetch('/directory_data');
-        const data = await response.json();
-        
-        let html = `<button class="refresh-btn" onclick="forceReloadDirectories()">Atualizar</button>`;
-        for (const mp of Object.keys(data)) {
-            const totalUsed = formatBytes(data[mp].total_used);
-            const percent = data[mp].percent;
-            html += `
-                <h3>${mp} (Total Usado: ${totalUsed}) (${percent}%)</h3>
-                <table border="1">
-                    <tr><th>Diretório</th><th>Tamanho</th></tr>
-                    ${(data[mp].items || []).map(item => `
-                        <tr><td>${item.path}</td><td>${item.size}</td></tr>
-                    `).join('')}
-                </table>
-                <hr>
-            `;
-        }
-        
-        document.getElementById('directories').innerHTML = html;
-        dataLoaded = true;
-    } catch (error) {
-        alert('Erro: ' + error);
-    } finally {
-        document.getElementById('loading').style.display = 'none';
-    }
-} */
+}
 
 function formatBytes(bytes) {
     const gb = bytes / (1024 ** 3);

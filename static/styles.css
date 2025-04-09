@@ -67,7 +67,7 @@ body {
     left: 0;
     width: 100vw; /* 100% da largura da viewport */
     height: 100vh; /* 100% da altura da viewport */
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.5);
     z-index: 100;
     display: none;
     justify-content: center;
@@ -103,10 +103,43 @@ table {
     overflow: hidden;
 }
 
+/* Efeito skeleton */
+.skeleton-title {
+    background: #e0e0e0;
+    width: 200px;
+    height: 24px;
+    border-radius: 4px;
+    margin: 10px 0;
+}
+
+.skeleton-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.skeleton-line {
+    background: #f0f0f0;
+    height: 20px;
+    margin: 4px 0;
+    border-radius: 4px;
+    animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-loading {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+}
+
 .table-wrapper {
     width: 100%;
     max-width: 800px;
     margin: 0 auto;
+    transition: opacity 0.3s ease;
+}
+
+.table-wrapper.skeleton {
+    opacity: 0.6;
 }
 
 .charts-container {
