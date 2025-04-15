@@ -31,6 +31,7 @@ disk-monitor/
 |-----------|----------|-------------------------------------|
 | FastAPI   | >=0.68.0 | Framework web para a API            |
 | uvicorn   | >=0.15.0 | Servidor ASGI                       |
+| jinja2    | >=3.1.6  | Template engine para Python web     |
 | psutil    | >=5.8.0  | Coleta de métricas do sistema       |
 | pandas    | >=1.3.0  | Manipulação de dados                |
 | plotly    | >=5.3.0  | Geração de gráficos interativos     |
@@ -47,7 +48,7 @@ yay -S python-fastapi uvicorn python-psutil python-pandas python-plotly
 ### Para Debian/Ubuntu:
 ```bash
 sudo apt install python3-pip
-pip install fastapi uvicorn psutil pandas plotly
+pip install fastapi uvicorn psutil pandas plotly jinja2
 ```
 
 ### Via pip (recomendado):
@@ -61,7 +62,7 @@ pip install -r requirements.txt  # Crie o arquivo com as dependências listadas 
 
 ## 🚀 Como Usar
 
-1. Inicie o servidor:
+1. Na raiz do projeto, inicie o servidor:
 ```bash
 uvicorn api:app --reload
 ```
